@@ -16,17 +16,35 @@ const client = new MongoClient(uri, {
 });
 async function run() {
   try {
-    const taskCollection = client
-      .db("Task Cosmos")
-      .collection("tasks");
+    const taskCollection = client.db("Task Cosmos").collection("tasks");
     // Root Api
     app.get("/", (req, res) => {
       res.send("DnD  server is running");
     });
     // tasks get api for getting all task from database
     app.get("/tasks", async (req, res) => {
-        const tasks = await taskCollection.find().toArray();
-        res.json(tasks);
+      const tasks = await taskCollection.find().toArray();
+      res.json(tasks);
+    });
+    // tasks post api for added task to database
+    app.post("/tasks", async (req, res) => {
+      const { title, description, category } = req.body;
+
+      if (!title || title.length > 50) {
+        return res.json({
+          error: "Title is required and must be under 50 characters",
+        });
+      }
+
+      const newTask = {
+        title,
+        description: description || "",
+        category: category || "To-Do",
+        timestamp: new Date(),
+      };
+
+      const result = await taskCollection.insertOne(newTask);
+      res.json(result);
     });
   } finally {
   }
