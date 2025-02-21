@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -44,6 +44,22 @@ async function run() {
       };
 
       const result = await taskCollection.insertOne(newTask);
+      res.json(result);
+    });
+    // task put api for update tasks
+    app.put("/tasks/:id", async (req, res) => {
+      const { id } = req.params;
+      const { title, description, category } = req.body;
+      const query = { _id: new ObjectId(id) };
+
+      const updatedTask = {
+        $set: {
+          title,
+          description,
+          category,
+        },
+      };
+      const result = await taskCollection.updateOne(query, updatedTask);
       res.json(result);
     });
   } finally {
