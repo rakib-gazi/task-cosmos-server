@@ -62,6 +62,12 @@ async function run() {
       const result = await taskCollection.updateOne(query, updatedTask);
       res.json(result);
     });
+    // task delete api for removed tasks
+    app.delete("/tasks/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await taskCollection.deleteOne({ _id: new ObjectId(id) });
+      res.json(result);
+    });
   } finally {
   }
 }
